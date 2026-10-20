@@ -890,8 +890,14 @@ function revealPrize(prize, resultSection, instructionText) {
     resultCard.setAttribute('data-prize-type', prize.type);
   }
 
+  // Animar aparición de la mascota Tío Dunes en el modal
   if (resultPrizeEmblem) {
-    resultPrizeEmblem.innerHTML = getPrizeSvg(prize.type);
+    const mascotImg = resultPrizeEmblem.querySelector('.result-mascot-img');
+    if (mascotImg) {
+      mascotImg.style.animation = 'none';
+      void mascotImg.offsetWidth;
+      mascotImg.style.animation = '';
+    }
   }
 
   if (resultCongrats) {

@@ -30,17 +30,13 @@
   <aside class="intro-splash" id="introSplash" role="status" aria-live="polite" aria-label="Presentación de Dunes Parfums">
     <div class="intro-splash-backdrop" aria-hidden="true"></div>
     <div class="intro-splash-card">
-      <div class="intro-crest-wrap">
-        <svg class="intro-fragrance-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 2C10.5 4.5 7 8 7 13C7 16.5 9.2 19.5 12 21C14.8 19.5 17 16.5 17 13C17 8 13.5 4.5 12 2ZM12 18.5C10.1 17.2 8.8 15 8.8 13C8.8 9.5 11.2 6.7 12 5.2C12.8 6.7 15.2 9.5 15.2 13C15.2 15 13.9 17.2 12 18.5Z"/>
-        </svg>
-        <span class="intro-sparkle intro-sparkle-1" aria-hidden="true">✦</span>
-        <span class="intro-sparkle intro-sparkle-2" aria-hidden="true">✦</span>
+      <div class="intro-mascot-wrap">
+        <div class="intro-mascot-aura" aria-hidden="true"></div>
+        <img src="logo/tiodunes_mascot.webp" alt="Mascota Tío Dunes" class="intro-mascot-img" width="560" height="566" decoding="async">
       </div>
       <div class="intro-brand-name">DUNES PARFUMS</div>
-      <div class="intro-brand-sub"></div>
       <div class="intro-divider" aria-hidden="true"></div>
-      <p class="intro-message">El Tío Dunes tiene un regalito para ti...</p>
+      <p class="intro-message">¡El Tío Dunes tiene un regalito para ti!</p>
     </div>
   </aside>
 
@@ -85,10 +81,10 @@
 
       <!-- Sección Hero -->
       <section class="hero-section" aria-labelledby="gameMainTitle">
-        <!-- Emblema gráfico sutil de perfumería -->
-        <svg class="hero-fragrance-crest" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 2C10.5 4.5 7 8 7 13C7 16.5 9.2 19.5 12 21C14.8 19.5 17 16.5 17 13C17 8 13.5 4.5 12 2ZM12 18.5C10.1 17.2 8.8 15 8.8 13C8.8 9.5 11.2 6.7 12 5.2C12.8 6.7 15.2 9.5 15.2 13C15.2 15 13.9 17.2 12 18.5Z"/>
-        </svg>
+        <!-- Mascota oficial Tío Dunes encima del título principal -->
+        <div class="hero-mascot-wrap">
+          <img src="logo/tiodunes_mascot.webp" alt="Tío Dunes" class="hero-mascot-img" width="560" height="566" decoding="async">
+        </div>
 
         <h1 class="hero-title" id="gameMainTitle">REGALITO DEL TÍO DUNES</h1>
         <p class="hero-subtitle">¡El Tío Dunes tiene una sorpresa para ti!</p>
@@ -318,8 +314,11 @@
           <div class="result-card-bg-glow" aria-hidden="true"></div>
 
           <div class="result-body">
-            <!-- 1. Icono superior del premio generado dinámicamente -->
-            <div class="result-prize-emblem" id="resultPrizeEmblem" aria-hidden="true"></div>
+            <!-- 1. Mascota oficial Tío Dunes con halo dorado y animación de aparición -->
+            <div class="result-mascot-wrap" id="resultPrizeEmblem" aria-hidden="true">
+              <div class="result-mascot-aura" aria-hidden="true"></div>
+              <img src="logo/tiodunes_mascot.webp" alt="Mascota Tío Dunes" class="result-mascot-img" id="resultMascotImg" width="560" height="566" decoding="async">
+            </div>
 
             <!-- 2. Texto "¡FELICIDADES!" -->
             <h2 class="result-congrats" id="resultCongrats">¡FELICIDADES!</h2>
