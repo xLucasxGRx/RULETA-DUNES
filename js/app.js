@@ -881,8 +881,6 @@ function revealPrize(prize, resultSection, instructionText) {
   const resultPrizeEmblem = document.getElementById('resultPrizeEmblem');
   const resultCongrats = document.getElementById('resultCongrats');
   const prizeHighlightBox = document.getElementById('prizeHighlightBox');
-  const prizeHighlightBadge = document.getElementById('prizeHighlightBadge');
-  const prizeTag = document.getElementById('prizeTag');
   const prizeTitlePrefix = document.getElementById('prizeTitlePrefix');
   const prizeTitleMain = document.getElementById('prizeTitleMain');
   const resultDescription = document.getElementById('resultDescription');
@@ -900,26 +898,19 @@ function revealPrize(prize, resultSection, instructionText) {
     resultCongrats.textContent = prize.title; // "¡FELICIDADES!"
   }
 
-  if (prizeTag) {
-    prizeTag.textContent = '✦ TU PREMIO ✦';
-  }
-
-  // Configuración del Gran Recuadro Central según FASE 2
+  // Configuración del Gran Recuadro Central del premio (solo nombre y cantidad ganada)
   if (prizeHighlightBox) {
     prizeHighlightBox.setAttribute('data-prize', prize.type);
 
     if (prize.type === 'decant_3ml') {
       if (prizeTitlePrefix) prizeTitlePrefix.textContent = 'DECANT DE';
       if (prizeTitleMain) prizeTitleMain.textContent = '3 ML';
-      if (prizeHighlightBadge) prizeHighlightBadge.hidden = true;
     } else if (prize.type === 'decant_5ml') {
       if (prizeTitlePrefix) prizeTitlePrefix.textContent = 'DECANT DE';
       if (prizeTitleMain) prizeTitleMain.textContent = '5 ML';
-      if (prizeHighlightBadge) prizeHighlightBadge.hidden = true;
     } else if (prize.type === 'discount_10') {
       if (prizeTitlePrefix) prizeTitlePrefix.textContent = 'S/ 10';
       if (prizeTitleMain) prizeTitleMain.textContent = 'DE DESCUENTO';
-      if (prizeHighlightBadge) prizeHighlightBadge.hidden = false;
     }
 
     // Efecto 1 y 2: Entrada luminosa y barrido de luz diagonal único

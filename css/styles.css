@@ -970,15 +970,20 @@ body::before {
 }
 
 /* ==========================================================================
-   ACTUALIZACIÓN 05.1: GRAN RECUADRO CENTRAL DEL PREMIO (.prize-highlight)
-   Zona protagonista, diferenciada y de alto impacto visual
+   ACTUALIZACIÓN 05.2: GRAN RECUADRO CENTRAL DEL PREMIO SIMPLIFICADO (.prize-highlight)
+   Zona protagonista limpia, refinada y con texto perfectamente centrado
    ========================================================================== */
 .prize-highlight {
   position: relative;
   width: 92%;
   max-width: 350px;
-  margin: 16px auto;
-  padding: 16px 18px 18px 18px;
+  margin: 14px auto 16px auto;
+  padding: 18px 16px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 104px;
   background: linear-gradient(145deg, #2b2313 0%, #17140e 50%, #231b0e 100%);
   border: 2px solid #d4a44c;
   border-radius: 14px;
@@ -1028,22 +1033,10 @@ body::before {
   box-shadow: 0 0 12px #f6e09a;
 }
 
-/* Etiqueta pequeña: "✦ TU PREMIO ✦" */
-.prize-tag {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: #f6e09a;
-  margin-bottom: 6px;
-  text-shadow: 0 0 8px rgba(246, 224, 154, 0.6);
-}
-
 /* Nombre del premio (Texto grande: "DECANT DE" o "S/ 10") */
 .prize-title-prefix {
   font-family: var(--font-display);
-  font-size: clamp(22px, 5.8vw, 28px);
+  font-size: clamp(20px, 5.5vw, 26px);
   font-weight: 700;
   letter-spacing: 0.08em;
   color: #ffffff;
@@ -1058,9 +1051,9 @@ body::before {
   font-size: clamp(34px, 9.5vw, 44px);
   font-weight: 800;
   letter-spacing: 0.06em;
-  line-height: 1.1;
+  line-height: 1.08;
   text-transform: uppercase;
-  margin-top: 2px;
+  margin-top: 3px;
   background: linear-gradient(135deg, #ffffff 10%, #fff2d6 35%, #f6e09a 65%, #c8a66a 95%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -1068,7 +1061,7 @@ body::before {
   filter: drop-shadow(0 0 14px rgba(246, 224, 154, 0.7));
 }
 
-/* Efecto 2: Barrido de luz diagonal que recorre la caja UNA SOLA VEZ */
+/* Efecto: Barrido de luz diagonal que recorre la caja UNA SOLA VEZ */
 .prize-shine-sweep {
   position: absolute;
   top: 0;
@@ -1099,21 +1092,6 @@ body::before {
     left: 200%;
     opacity: 0;
   }
-}
-
-/* Insignia "PREMIO MAYOR" para el beneficio de descuento S/ 10 */
-.prize-highlight-badge {
-  display: inline-block;
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #12151d;
-  background: linear-gradient(135deg, #ffffff 0%, #fff2d6 40%, #e8d5ac 100%);
-  border-radius: var(--radius-full);
-  padding: 3px 12px;
-  margin-bottom: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 12px rgba(246, 224, 154, 0.6);
 }
 
 /* Variaciones temáticas por premio */
