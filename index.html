@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <meta name="description" content="El Misterio del Aroma — Experiencia interactiva exclusiva de perfumería para descubrir un regalo sorpresa con tu compra elegible.">
+  <meta name="description" content="Regalito del Tío Dunes — Experiencia interactiva exclusiva de perfumería para descubrir un regalo sorpresa con tu compra elegible.">
   <meta name="theme-color" content="#0e1015">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="robots" content="noindex, nofollow">
 
-  <title>El Misterio del Aroma | Dunes Parfums</title>
+  <title>Regalito del Tío Dunes | Dunes Parfums</title>
 
   <!-- Tipografías de Alta Perfumería -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,6 +23,27 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%2312151c' stroke='%23c8a66a' stroke-width='2'/><text x='16' y='21' font-family='serif' font-size='16' font-weight='bold' fill='%23e8d5ac' text-anchor='middle'>?</text></svg>">
 </head>
 <body>
+
+  <!-- ====================================================================
+       0. PANTALLA DE PRESENTACIÓN INICIAL (SPLASH SCREEN)
+       ==================================================================== -->
+  <aside class="intro-splash" id="introSplash" role="status" aria-live="polite" aria-label="Presentación de Dunes Parfums">
+    <div class="intro-splash-backdrop" aria-hidden="true"></div>
+    <div class="intro-splash-card">
+      <div class="intro-crest-wrap">
+        <svg class="intro-fragrance-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2C10.5 4.5 7 8 7 13C7 16.5 9.2 19.5 12 21C14.8 19.5 17 16.5 17 13C17 8 13.5 4.5 12 2ZM12 18.5C10.1 17.2 8.8 15 8.8 13C8.8 9.5 11.2 6.7 12 5.2C12.8 6.7 15.2 9.5 15.2 13C15.2 15 13.9 17.2 12 18.5Z"/>
+        </svg>
+        <span class="intro-sparkle intro-sparkle-1" aria-hidden="true">✦</span>
+        <span class="intro-sparkle intro-sparkle-2" aria-hidden="true">✦</span>
+      </div>
+      <div class="intro-brand-name">DUNES PARFUMS</div>
+      <div class="intro-brand-sub"></div>
+      <div class="intro-divider" aria-hidden="true"></div>
+      <p class="intro-message">El Tío Dunes tiene un regalito para ti...</p>
+    </div>
+  </aside>
+
   <div class="app-wrapper">
 
     <!-- ====================================================================
@@ -69,13 +90,18 @@
           <path d="M12 2C10.5 4.5 7 8 7 13C7 16.5 9.2 19.5 12 21C14.8 19.5 17 16.5 17 13C17 8 13.5 4.5 12 2ZM12 18.5C10.1 17.2 8.8 15 8.8 13C8.8 9.5 11.2 6.7 12 5.2C12.8 6.7 15.2 9.5 15.2 13C15.2 15 13.9 17.2 12 18.5Z"/>
         </svg>
 
-        <h1 class="hero-title" id="gameMainTitle">EL MISTERIO DEL AROMA</h1>
-        <p class="hero-subtitle">Tu compra esconde una sorpresa.</p>
+        <h1 class="hero-title" id="gameMainTitle">REGALITO DEL TÍO DUNES</h1>
+        <p class="hero-subtitle">¡El Tío Dunes tiene una sorpresa para ti!</p>
 
-        <!-- Píldora de instrucción dinámica -->
-        <div class="instruction-pill" id="instructionBox" role="status" aria-live="polite">
-          <span class="instruction-sparkle" aria-hidden="true">✦</span>
-          <p class="instruction-text" id="instructionText">Elige uno de los tres frascos y descubre tu regalo.</p>
+        <!-- Píldora de instrucción dinámica + Botón Info de Premios -->
+        <div class="instruction-row">
+          <div class="instruction-pill" id="instructionBox" role="status" aria-live="polite">
+            <span class="instruction-sparkle" aria-hidden="true">✦</span>
+            <p class="instruction-text" id="instructionText">Elige uno de los tres frascos y descubre tu regalito.</p>
+          </div>
+          <button type="button" class="btn-info-trigger" id="btnInfoTrigger" aria-label="Ver premios disponibles y probabilidades" title="Ver premios disponibles">
+            <span class="info-icon" aria-hidden="true">?</span>
+          </button>
         </div>
       </section>
 
@@ -114,12 +140,16 @@
                   </radialGradient>
                 </defs>
 
-                <!-- Tapón joya facetado con corona dorada -->
-                <rect x="42" y="10" width="36" height="24" rx="4" fill="#1A1E27" stroke="url(#goldCapGrad1)" stroke-width="1.5"/>
-                <rect x="45" y="13" width="30" height="4" rx="1" fill="url(#goldCapGrad1)" opacity="0.6"/>
-                <line x1="43" y1="22" x2="77" y2="22" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
-                <rect x="40" y="32" width="40" height="5" rx="2" fill="url(#goldCapGrad1)"/>
+                <!-- Tapón joya facetado con corona dorada (apertura física animada) -->
+                <g class="bottle-cap-group" id="bottleCap1">
+                  <rect x="42" y="10" width="36" height="24" rx="4" fill="#1A1E27" stroke="url(#goldCapGrad1)" stroke-width="1.5"/>
+                  <rect x="45" y="13" width="30" height="4" rx="1" fill="url(#goldCapGrad1)" opacity="0.6"/>
+                  <line x1="43" y1="22" x2="77" y2="22" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+                  <rect x="40" y="32" width="40" height="5" rx="2" fill="url(#goldCapGrad1)"/>
+                </g>
                 <rect x="51" y="37" width="18" height="9" fill="url(#neckGrad1)"/>
+                <!-- Resplandor luminoso del cuello del frasco al abrirse -->
+                <ellipse class="bottle-neck-aura" cx="60" cy="38" rx="16" ry="6" fill="url(#goldCapGrad1)" opacity="0"/>
 
                 <!-- Cuerpo de cristal del frasco -->
                 <rect x="18" y="46" width="84" height="116" rx="10" fill="url(#flaconGlass1)" stroke="url(#goldCapGrad1)" stroke-width="1.4"/>
@@ -174,12 +204,16 @@
                   </radialGradient>
                 </defs>
 
-                <!-- Tapón joya facetado con corona dorada -->
-                <rect x="42" y="10" width="36" height="24" rx="4" fill="#1A1E27" stroke="url(#goldCapGrad2)" stroke-width="1.5"/>
-                <rect x="45" y="13" width="30" height="4" rx="1" fill="url(#goldCapGrad2)" opacity="0.6"/>
-                <line x1="43" y1="22" x2="77" y2="22" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
-                <rect x="40" y="32" width="40" height="5" rx="2" fill="url(#goldCapGrad2)"/>
+                <!-- Tapón joya facetado con corona dorada (apertura física animada) -->
+                <g class="bottle-cap-group" id="bottleCap2">
+                  <rect x="42" y="10" width="36" height="24" rx="4" fill="#1A1E27" stroke="url(#goldCapGrad2)" stroke-width="1.5"/>
+                  <rect x="45" y="13" width="30" height="4" rx="1" fill="url(#goldCapGrad2)" opacity="0.6"/>
+                  <line x1="43" y1="22" x2="77" y2="22" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+                  <rect x="40" y="32" width="40" height="5" rx="2" fill="url(#goldCapGrad2)"/>
+                </g>
                 <rect x="51" y="37" width="18" height="9" fill="url(#neckGrad2)"/>
+                <!-- Resplandor luminoso del cuello del frasco al abrirse -->
+                <ellipse class="bottle-neck-aura" cx="60" cy="38" rx="16" ry="6" fill="url(#goldCapGrad2)" opacity="0"/>
 
                 <!-- Cuerpo de cristal del frasco -->
                 <rect x="18" y="46" width="84" height="116" rx="10" fill="url(#flaconGlass2)" stroke="url(#goldCapGrad2)" stroke-width="1.4"/>
@@ -234,12 +268,16 @@
                   </radialGradient>
                 </defs>
 
-                <!-- Tapón joya facetado con corona dorada -->
-                <rect x="42" y="10" width="36" height="24" rx="4" fill="#1A1E27" stroke="url(#goldCapGrad3)" stroke-width="1.5"/>
-                <rect x="45" y="13" width="30" height="4" rx="1" fill="url(#goldCapGrad3)" opacity="0.6"/>
-                <line x1="43" y1="22" x2="77" y2="22" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
-                <rect x="40" y="32" width="40" height="5" rx="2" fill="url(#goldCapGrad3)"/>
+                <!-- Tapón joya facetado con corona dorada (apertura física animada) -->
+                <g class="bottle-cap-group" id="bottleCap3">
+                  <rect x="42" y="10" width="36" height="24" rx="4" fill="#1A1E27" stroke="url(#goldCapGrad3)" stroke-width="1.5"/>
+                  <rect x="45" y="13" width="30" height="4" rx="1" fill="url(#goldCapGrad3)" opacity="0.6"/>
+                  <line x1="43" y1="22" x2="77" y2="22" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+                  <rect x="40" y="32" width="40" height="5" rx="2" fill="url(#goldCapGrad3)"/>
+                </g>
                 <rect x="51" y="37" width="18" height="9" fill="url(#neckGrad3)"/>
+                <!-- Resplandor luminoso del cuello del frasco al abrirse -->
+                <ellipse class="bottle-neck-aura" cx="60" cy="38" rx="16" ry="6" fill="url(#goldCapGrad3)" opacity="0"/>
 
                 <!-- Cuerpo de cristal del frasco -->
                 <rect x="18" y="46" width="84" height="116" rx="10" fill="url(#flaconGlass3)" stroke="url(#goldCapGrad3)" stroke-width="1.4"/>
@@ -270,29 +308,35 @@
       </div>
 
       <!-- ====================================================================
-           3. SECCIÓN DE RESULTADOS (PREMIO REVELADO)
+           3. SECCIÓN DE RESULTADOS (PREMIO REVELADO — MODAL CENTRADO)
            ==================================================================== -->
-      <section class="result-section" id="resultSection" aria-live="polite" hidden>
-        <div class="result-card" data-prize-type="decant_3ml">
+      <section class="result-section" id="resultSection" role="dialog" aria-modal="true" aria-labelledby="resultCongrats" aria-live="polite" hidden>
+        <!-- Canvas de celebración con fuegos artificiales / chispas elegantes -->
+        <canvas class="celebration-canvas" id="celebrationCanvas" aria-hidden="true"></canvas>
+
+        <div class="result-card" id="resultCard" data-prize-type="decant_3ml">
           <div class="result-card-bg-glow" aria-hidden="true"></div>
 
           <div class="result-body">
-            <!-- Icono del Premio generado dinámicamente -->
+            <!-- 1. Icono superior del premio generado dinámicamente -->
             <div class="result-prize-emblem" id="resultPrizeEmblem" aria-hidden="true"></div>
 
-            <!-- Etiqueta de Categoría -->
-            <span class="result-badge" id="resultBadge">PREMIO EXCLUSIVO</span>
-
-            <!-- Título de Felicitaciones -->
+            <!-- 2. Texto "¡FELICIDADES!" -->
             <h2 class="result-congrats" id="resultCongrats">¡FELICIDADES!</h2>
 
-            <!-- Nombre principal del premio -->
-            <p class="result-prize-name" id="resultPrizeName">Ganaste un decant de 3 ml</p>
+            <!-- 3. GRAN RECUADRO CENTRAL DEL PREMIO (Zona protagonista y muy notoria) -->
+            <div class="prize-highlight" id="prizeHighlightBox">
+              <span class="prize-highlight-badge" id="prizeHighlightBadge" hidden>PREMIO MAYOR</span>
+              <span class="prize-tag" id="prizeTag">✦ TU PREMIO ✦</span>
+              <div class="prize-title-prefix" id="prizeTitlePrefix">DECANT DE</div>
+              <div class="prize-title-main" id="prizeTitleMain">3 ML</div>
+              <div class="prize-shine-sweep" aria-hidden="true"></div>
+            </div>
 
-            <!-- Descripción del premio -->
+            <!-- 4. Frase secundaria explicativa -->
             <p class="result-description" id="resultDescription">Fragancia sorpresa seleccionada por nuestra perfumería.</p>
 
-            <!-- Indicación para presentar al vendedor -->
+            <!-- 5. Aviso de presentación al vendedor -->
             <div class="result-notice-box">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"/>
@@ -300,7 +344,7 @@
               <span class="result-notice-text">Presenta tu resultado al vendedor.</span>
             </div>
 
-            <!-- Botón discreto para reiniciar el juego -->
+            <!-- 6. Botón "NUEVA PARTIDA" -->
             <button type="button" class="btn-new-game" id="btnNewGame">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4C7.58 4 4.01 7.58 4.01 12C4.01 16.42 7.58 20 12 20C15.73 20 18.84 17.45 19.73 14H17.65C16.83 16.33 14.61 18 12 18C8.69 18 6 15.31 6 12C6 8.69 8.69 6 12 6C13.66 6 15.14 6.69 16.22 7.78L13 11H20V4L17.65 6.35Z"/>
@@ -310,6 +354,12 @@
           </div>
         </div>
       </section>
+
+      <!-- Capa de efectos cinemáticos (esfera luminosa viajera y partículas de cuello) -->
+      <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
+
+      <!-- Capa de fuegos artificiales de celebración (z-index superior al modal, visible en viewport) -->
+      <div class="fireworks-layer" id="fireworksLayer" aria-hidden="true"></div>
 
     </main>
 
@@ -330,16 +380,16 @@
     <div class="modal-card">
       <button type="button" class="modal-close-btn" id="modalCloseBtn" aria-label="Cerrar ventana emergente">&times;</button>
       
-      <h3 class="modal-title" id="modalTitle">Escanear para jugar</h3>
-      <p class="modal-instruction">Apunta con la cámara de tu celular para abrir este juego en tu dispositivo.</p>
+      <h3 class="modal-title" id="modalTitle">Escanea y descubre tu sorpresa</h3>
+      <p class="modal-instruction">Escanea con la cámara de tu celular para jugar</p>
       
-      <!-- Marco que contiene el SVG del QR -->
+      <!-- Marco que contiene el SVG del QR con fondo blanco amplio para contraste de cámara -->
       <div class="qr-frame">
         <div class="qr-code-display" id="qrCodeDisplay" aria-label="Código QR del juego"></div>
       </div>
 
-      <!-- Texto del enlace actual -->
-      <div class="qr-url-text" id="qrUrlText"></div>
+      <!-- Texto del enlace oficial -->
+      <div class="qr-url-text" id="qrUrlText">https://xlucasxgrx.github.io/RULETA-DUNES/</div>
 
       <!-- Acciones del modal -->
       <div class="modal-actions">
@@ -349,6 +399,70 @@
           </svg>
           <span>Copiar enlace</span>
         </button>
+        <button type="button" class="btn-modal-close" id="btnModalClose">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       5.5 MODAL DE INFORMACIÓN DE PREMIOS Y PROBABILIDADES
+       ==================================================================== -->
+  <div class="modal-overlay" id="infoModal" role="dialog" aria-modal="true" aria-labelledby="infoModalTitle" hidden>
+    <div class="modal-card info-modal-card">
+      <button type="button" class="modal-close-btn" id="infoModalCloseBtn" aria-label="Cerrar ventana informativa">&times;</button>
+      
+      <div class="info-modal-header">
+        <svg class="info-header-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2C10.5 4.5 7 8 7 13C7 16.5 9.2 19.5 12 21C14.8 19.5 17 16.5 17 13C17 8 13.5 4.5 12 2ZM12 18.5C10.1 17.2 8.8 15 8.8 13C8.8 9.5 11.2 6.7 12 5.2C12.8 6.7 15.2 9.5 15.2 13C15.2 15 13.9 17.2 12 18.5Z"/>
+        </svg>
+        <h3 class="modal-title" id="infoModalTitle">Premios disponibles</h3>
+      </div>
+      
+      <p class="modal-instruction">Conoce los premios y sus probabilidades en cada jugada:</p>
+
+      <ul class="prizes-info-list" role="list">
+        <!-- Premio 1: 3 ml -->
+        <li class="prize-info-item">
+          <div class="prize-info-icon-col">
+            <span class="prize-info-badge-vol">3 ml</span>
+          </div>
+          <div class="prize-info-content">
+            <span class="prize-info-name">Decant de perfume al azar de 3 ml</span>
+            <span class="prize-info-desc">Fragancia seleccionada por nuestra perfumería</span>
+          </div>
+          <div class="prize-info-prob">70%</div>
+        </li>
+
+        <!-- Premio 2: 5 ml -->
+        <li class="prize-info-item">
+          <div class="prize-info-icon-col">
+            <span class="prize-info-badge-vol">5 ml</span>
+          </div>
+          <div class="prize-info-content">
+            <span class="prize-info-name">Decant de perfume al azar de 5 ml</span>
+            <span class="prize-info-desc">Mayor cantidad de fragancia para disfrutar</span>
+          </div>
+          <div class="prize-info-prob">20%</div>
+        </li>
+
+        <!-- Premio 3: S/ 10 (DESTACADO / PREMIO MAYOR) -->
+        <li class="prize-info-item prize-info-featured">
+          <span class="prize-featured-ribbon">PREMIO MAYOR</span>
+          <div class="prize-info-icon-col">
+            <span class="prize-info-badge-vol gold-badge">S/ 10</span>
+          </div>
+          <div class="prize-info-content">
+            <span class="prize-info-name featured-name">S/ 10 de descuento en tu próxima compra</span>
+            <span class="prize-info-desc">Beneficio directo coordinado con el vendedor</span>
+          </div>
+          <div class="prize-info-prob featured-prob">10%</div>
+        </li>
+      </ul>
+
+      <p class="prizes-disclaimer">✦ Todos los premios son sorpresa y se asignan aleatoriamente.</p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-close" id="btnInfoModalClose">Entendido</button>
       </div>
     </div>
   </div>

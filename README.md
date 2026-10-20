@@ -1,19 +1,25 @@
-# EL MISTERIO DEL AROMA ✦ DUNES PARFUMS
+# REGALITO DEL TÍO DUNES ✦ DUNES PARFUMS
 ### Minijuego Web Premium para Clientes de Perfumería
 
-Experiencia web interactiva *Mobile-First*, elegante y minimalista desarrollada para **DUNES PARFUMS** (u otras perfumerías de lujo). Permite a los clientes elegibles descubrir un premio sorpresa presencial tras realizar una compra de perfume a precio regular.
+Experiencia web interactiva *Mobile-First*, elegante y minimalista desarrollada para **DUNES PARFUMS**. Permite a los clientes elegibles descubrir un premio sorpresa presencial tras realizar una compra de perfume a precio regular.
 
 ---
 
 ## 1. Características Principales
 
 - **Diseño Mobile-First de Alta Gama**: Diseñado con estética de perfumería de lujo (negro carbón, dorado champagne `#C8A66A` y blanco marfil `#F5F0E8`).
+- **Apertura Física del Frasco y Esfera Viajera**: Al seleccionar un frasco, su tapón se eleva e inclina de forma realista, emanan chispas doradas desde el cuello y una esfera luminosa viaja en trayectoria curva continua hacia el centro de la pantalla hasta transformarse en el premio.
+- **Premio Protagónico con Recuadro Destacado**: Tarjeta modal centrada con bloque de premio prominente (*PREMIO OBTENIDO* en mayúsculas de gran tamaño), diferenciación por tipo de fragancia y destaque especial para el beneficio mayor (S/ 10 de descuento).
+- **Celebración con Fuegos Artificiales**: Partículas y chispas doradas/champagne sincronizadas con la revelación del premio mediante un canvas ultraligero que se auto-limpia en 1.8 segundos.
+- **Barajado Automático de Frascos**: Mezcla fluida y dinámica de los tres frascos misteriosos mediante transformaciones matemáticas adaptadas al ancho de pantalla en tiempo real.
+- **Panel Informativo de Premios y Probabilidades**: Botón discreto (?) que despliega un modal con los 3 premios, destacando con aura dorada el premio mayor (S/ 10 de descuento — 10%).
+- **Bloqueo Inteligente de Interacciones**: Protección absoluta contra pulsaciones anticipadas o concurrentes durante el barajado, apertura o revelación.
 - **Arquitectura 100% Estática**: Sin frameworks pesados, sin bases de datos, sin backend ni cuentas de usuario.
-- **Gráficos Vectoriales SVG**: Frascos de perfume misteriosos en SVG con efectos de refracción de vidrio, tapón joya y halo dorado.
-- **Animaciones Fluidas**: Transiciones aceleradas por hardware (`transform`, `opacity`, `filter`) dentro de 1 a 2 segundos.
+- **Gráficos Vectoriales SVG**: Frascos de perfume misteriosos en SVG con tapón facetado joya animable independientemente y medallón central.
+- **Animaciones Fluidas**: Transiciones aceleradas por hardware (`transform`, `opacity`, `filter`) con soporte completo para `prefers-reduced-motion`.
 - **Selección Aleatoria Criptográfica Ponderada**: Implementación mediante `crypto.getRandomValues()` cuando esté disponible, garantizando equidad sin patrones predecibles.
 - **Efectos Sensoriales Ligeros**: Acordes sonoros discretos sintetizados mediante la **Web Audio API** nativa (sin archivos de audio pesados) y respuesta háptica (`navigator.vibrate`) en celulares compatibles.
-- **Acceso mediante Código QR**: Modal integrado con generación de QR vectorial 100% local y botón para copiar enlace al portapapeles.
+- **Acceso mediante Código QR**: Modal integrado con generación de QR vectorial 100% local a la URL oficial `https://xlucasxgrx.github.io/RULETA-DUNES/` y botón para copiar enlace al portapapeles.
 - **Listo para GitHub Pages**: Enlaces y recursos relativos para publicación directa en un clic.
 
 ---
@@ -62,17 +68,18 @@ Si tienes Python o Node.js instalado:
 
 ## 4. Guía de Personalización
 
-### A. Modificar el Nombre de la Perfumería y Enlace Público
-Abre el archivo [js/app.js](file:///c:/RULETA-DUNES/js/app.js) y edita el objeto inicial `GAME_CONFIG`:
+### A. Modificar el Nombre de la Perfumería y Enlace Oficial
+Abre el archivo [js/app.js](file:///c:/RULETA-DUNES/js/app.js) donde se encuentra centralizada la URL oficial:
 
 ```javascript
+// URL oficial y definitiva del juego publicado en GitHub Pages
+const GAME_URL = "https://xlucasxgrx.github.io/RULETA-DUNES/";
+
 const GAME_CONFIG = {
   // Nombre de la marca o perfumería
   brandName: 'DUNES PARFUMS',
   brandTagline: 'Perfumes Originales Sellados',
-
-  // URL pública de tu GitHub Pages (se usará como respaldo para el QR si pruebas en local)
-  publicUrlFallback: 'https://tu-usuario.github.io/ruleta-dunes/',
+  officialUrl: GAME_URL,
   ...
 };
 ```

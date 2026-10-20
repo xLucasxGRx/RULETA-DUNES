@@ -115,6 +115,151 @@ body::before {
 }
 
 /* --------------------------------------------------------------------------
+   2.5 PANTALLA DE PRESENTACIÓN INICIAL (SPLASH SCREEN)
+   -------------------------------------------------------------------------- */
+.intro-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 50% 45%, rgba(38, 46, 62, 0.85) 0%, transparent 65%),
+    linear-gradient(180deg, #11141b 0%, #0a0c10 100%);
+  padding: 20px;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.45s;
+  pointer-events: auto;
+}
+
+.intro-splash.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.intro-splash-backdrop {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(200, 166, 106, 0.15) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.intro-splash-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 340px;
+  animation: introFadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes introFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.intro-crest-wrap {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200, 166, 106, 0.25) 0%, rgba(20, 24, 32, 0.8) 80%);
+  border: 1px solid var(--gold-border-bright);
+  box-shadow: 0 0 30px var(--gold-glow);
+}
+
+.intro-fragrance-icon {
+  width: 30px;
+  height: 30px;
+  color: var(--gold-300);
+  filter: drop-shadow(0 0 8px var(--gold-glow-intense));
+}
+
+.intro-sparkle {
+  position: absolute;
+  color: var(--gold-200);
+  font-size: 0.75rem;
+  line-height: 1;
+  animation: sparkleTwinkle 1.8s ease-in-out infinite alternate;
+}
+
+.intro-sparkle-1 {
+  top: -4px;
+  right: -4px;
+  animation-delay: 0.2s;
+}
+
+.intro-sparkle-2 {
+  bottom: 0px;
+  left: -4px;
+  animation-delay: 0.7s;
+}
+
+@keyframes sparkleTwinkle {
+  0% { opacity: 0.3; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.2); filter: drop-shadow(0 0 6px var(--gold-glow-intense)); }
+}
+
+.intro-brand-name {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #ffffff;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #ffffff 20%, #f4ebd6 50%, #c8a66a 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7));
+  margin-bottom: 3px;
+}
+
+.intro-brand-sub {
+  font-size: 0.68rem;
+  letter-spacing: 0.25em;
+  color: var(--gold-400);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.intro-divider {
+  width: 50px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-400), transparent);
+  margin-bottom: 14px;
+}
+
+.intro-message {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--gold-100);
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  line-height: 1.4;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* --------------------------------------------------------------------------
    3. ESTRUCTURA Y CONTENEDOR PRINCIPAL
    -------------------------------------------------------------------------- */
 .app-wrapper {
@@ -261,11 +406,11 @@ body::before {
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 5.5vw, 1.9rem);
+  font-size: clamp(1.25rem, 5vw, 1.85rem);
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  line-height: 1.15;
+  line-height: 1.2;
   margin-bottom: 6px;
   background: linear-gradient(135deg, #ffffff 15%, #f5e2bf 50%, #c8a66a 85%, #e8d5ac 100%);
   -webkit-background-clip: text;
@@ -282,6 +427,15 @@ body::before {
   margin-bottom: 12px;
 }
 
+.instruction-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 96%;
+}
+
 .instruction-pill {
   display: inline-flex;
   align-items: center;
@@ -291,7 +445,7 @@ body::before {
   border: 1px solid var(--gold-border);
   padding: 8px 16px;
   border-radius: var(--radius-full);
-  max-width: 95%;
+  max-width: 88%;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
@@ -307,6 +461,51 @@ body::before {
   color: var(--gold-100);
   letter-spacing: 0.02em;
   margin: 0;
+}
+
+/* Botón de Información / Interrogación */
+.btn-info-trigger {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(23, 26, 33, 0.85);
+  border: 1px solid var(--gold-border);
+  color: var(--gold-300);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-sm);
+  touch-action: manipulation;
+}
+
+.btn-info-trigger:hover,
+.btn-info-trigger:focus-visible {
+  background: rgba(45, 52, 68, 0.95);
+  border-color: var(--gold-200);
+  color: #ffffff;
+  box-shadow: 0 0 16px var(--gold-glow);
+  outline: none;
+  transform: scale(1.08);
+}
+
+/* Pulso dorado de aviso cuando los frascos están listos tras barajar */
+.instruction-pill.is-ready-pulse {
+  animation: readyInstructionPulse 1s cubic-bezier(0.22, 1, 0.36, 1) 2;
+  border-color: var(--gold-200);
+  background: linear-gradient(90deg, rgba(200, 166, 106, 0.18) 0%, rgba(232, 213, 172, 0.32) 50%, rgba(200, 166, 106, 0.18) 100%);
+}
+
+@keyframes readyInstructionPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(200, 166, 106, 0); }
+  50% { transform: scale(1.04); box-shadow: 0 0 18px var(--gold-glow); }
+  100% { transform: scale(1); box-shadow: 0 0 0 rgba(200, 166, 106, 0); }
 }
 
 /* --------------------------------------------------------------------------
@@ -459,8 +658,24 @@ body::before {
 }
 
 /* --------------------------------------------------------------------------
-   7. ANIMACIÓN DE REVELACIÓN Y ESTADOS AL ELEGIR FRASCO
+   7. ANIMACIÓN DE BARAJADO, REVELACIÓN Y ESTADOS AL ELEGIR FRASCO
    -------------------------------------------------------------------------- */
+/* Estado: Barajando frascos */
+.game-area-container.is-shuffling {
+  pointer-events: none;
+  user-select: none;
+}
+
+.game-area-container.is-shuffling .bottle-card {
+  cursor: wait;
+}
+
+.bottle-card.is-shuffling-active {
+  transition: none !important;
+  box-shadow: 0 0 25px var(--gold-glow), 0 8px 20px rgba(0, 0, 0, 0.7);
+  border-color: var(--gold-300);
+}
+
 /* Estado: Juego en curso (animando revelación) */
 .game-area-container.is-animating .bottle-card:disabled {
   cursor: wait;
@@ -491,6 +706,76 @@ body::before {
   filter: grayscale(40%) blur(0.5px);
   transform: scale(0.96);
   pointer-events: none;
+}
+
+/* ==========================================================================
+   ACTUALIZACIÓN 06: APERTURA REALISTA DE LA TAPA Y EMISIÓN DE LUZ
+   ========================================================================== */
+.bottle-cap-group {
+  transform-origin: 60px 35px;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+/* Cuando el frasco se selecciona / comienza a abrirse */
+.bottle-card.is-selected .bottle-cap-group,
+.bottle-card.is-opening .bottle-cap-group {
+  animation: capOpenFloat 1.25s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+@keyframes capOpenFloat {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  20% {
+    transform: translateY(-4px) rotate(-2deg);
+  }
+  48% {
+    transform: translateY(-24px) rotate(-14deg);
+    filter: drop-shadow(0 0 8px rgba(255, 245, 224, 0.85));
+  }
+  75% {
+    transform: translateY(-21px) rotate(-11deg);
+    filter: drop-shadow(0 0 10px rgba(246, 224, 154, 0.9));
+  }
+  100% {
+    transform: translateY(-22px) rotate(-12deg);
+    filter: drop-shadow(0 0 8px rgba(246, 224, 154, 0.85));
+  }
+}
+
+/* Resplandor y halo dorado que emana del cuello del frasco */
+.bottle-neck-aura {
+  pointer-events: none;
+  transform-origin: 60px 38px;
+  transition: opacity 0.3s ease;
+  will-change: transform, opacity;
+}
+
+.bottle-card.is-selected .bottle-neck-aura,
+.bottle-card.is-opening .bottle-neck-aura {
+  animation: neckGlowEmerge 1.25s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+@keyframes neckGlowEmerge {
+  0%, 15% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.4);
+    filter: drop-shadow(0 0 16px rgba(246, 224, 154, 1));
+  }
+  75% {
+    opacity: 0.9;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 10px rgba(232, 213, 172, 0.85));
+  }
 }
 
 @keyframes revealPulse {
@@ -540,35 +825,58 @@ body::before {
 }
 
 /* --------------------------------------------------------------------------
-   8. PANTALLA Y TARJETA DE RESULTADOS
+   8. PANTALLA Y TARJETA DE RESULTADOS (MODAL CENTRADO EN EL VIEWPORT)
    -------------------------------------------------------------------------- */
 .result-section {
-  width: 100%;
-  margin-top: 4px;
-  animation: resultSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: var(--bg-surface-overlay);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s var(--ease-smooth);
 }
 
-@keyframes resultSlideUp {
-  0% {
-    opacity: 0;
-    transform: translateY(24px) scale(0.97);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.result-section:not([hidden]) {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .result-card {
   position: relative;
-  background: linear-gradient(180deg, rgba(30, 35, 46, 0.95) 0%, rgba(17, 19, 24, 0.98) 100%);
+  width: 100%;
+  max-width: 400px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, rgba(30, 35, 46, 0.98) 0%, rgba(17, 19, 24, 0.99) 100%);
   border: 1px solid var(--gold-border-bright);
   border-radius: var(--radius-lg);
-  padding: 22px 18px 20px 18px;
+  padding: 24px 20px 22px 20px;
   text-align: center;
-  box-shadow: var(--shadow-lg), 0 0 35px rgba(200, 166, 106, 0.22);
-  backdrop-filter: blur(14px);
-  overflow: hidden;
+  box-shadow: var(--shadow-lg), 0 0 45px rgba(200, 166, 106, 0.28);
+  backdrop-filter: blur(16px);
+  transform: scale(0.9) translateY(18px);
+  transition: transform 0.38s var(--ease-bounce);
+}
+
+.result-section:not([hidden]) .result-card {
+  transform: scale(1) translateY(0);
+}
+
+/* Canvas de fuegos artificiales / celebración visual */
+.celebration-canvas {
+  position: absolute;
+  inset: -40px;
+  width: calc(100% + 80px);
+  height: calc(100% + 80px);
+  pointer-events: none;
+  z-index: 15;
 }
 
 /* Efecto de resplandor superior en la tarjeta */
@@ -651,36 +959,200 @@ body::before {
   background: radial-gradient(circle, rgba(216, 188, 126, 0.3) 0%, rgba(20, 24, 32, 0.6) 80%);
 }
 
-.result-badge {
-  font-size: 0.65rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gold-300);
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
 .result-congrats {
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 5vw, 1.7rem);
+  font-size: clamp(1.4rem, 5.5vw, 1.75rem);
   font-weight: 700;
   letter-spacing: 0.16em;
   color: #ffffff;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
-  margin-bottom: 6px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8), 0 0 20px rgba(232, 213, 172, 0.45);
+  margin-bottom: 4px;
 }
 
-.result-prize-name {
+/* ==========================================================================
+   ACTUALIZACIÓN 05.1: GRAN RECUADRO CENTRAL DEL PREMIO (.prize-highlight)
+   Zona protagonista, diferenciada y de alto impacto visual
+   ========================================================================== */
+.prize-highlight {
+  position: relative;
+  width: 92%;
+  max-width: 350px;
+  margin: 16px auto;
+  padding: 16px 18px 18px 18px;
+  background: linear-gradient(145deg, #2b2313 0%, #17140e 50%, #231b0e 100%);
+  border: 2px solid #d4a44c;
+  border-radius: 14px;
+  box-shadow: 0 0 25px rgba(212, 164, 76, 0.45), 
+              inset 0 0 20px rgba(212, 164, 76, 0.2), 
+              0 8px 30px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  text-align: center;
+  transition: all var(--trans-normal);
+  will-change: transform, box-shadow;
+}
+
+/* Animación de entrada luminosa al revelar el premio */
+.prize-highlight.is-revealed {
+  animation: prizeBoxReveal 0.65s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+@keyframes prizeBoxReveal {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+    box-shadow: 0 0 0 rgba(246, 224, 154, 0);
+  }
+  60% {
+    transform: scale(1.03);
+    opacity: 1;
+    box-shadow: 0 0 45px rgba(246, 224, 154, 0.8), 0 0 80px rgba(212, 164, 76, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 25px rgba(212, 164, 76, 0.45), 
+                inset 0 0 20px rgba(212, 164, 76, 0.2), 
+                0 8px 30px rgba(0, 0, 0, 0.7);
+  }
+}
+
+/* Línea de resplandor superior en el recuadro */
+.prize-highlight::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffffff, #f6e09a, transparent);
+  box-shadow: 0 0 12px #f6e09a;
+}
+
+/* Etiqueta pequeña: "✦ TU PREMIO ✦" */
+.prize-tag {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #f6e09a;
+  margin-bottom: 6px;
+  text-shadow: 0 0 8px rgba(246, 224, 154, 0.6);
+}
+
+/* Nombre del premio (Texto grande: "DECANT DE" o "S/ 10") */
+.prize-title-prefix {
   font-family: var(--font-display);
-  font-size: clamp(1.1rem, 4.2vw, 1.35rem);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  background: linear-gradient(135deg, #ffffff 10%, #f4ebd6 50%, #c8a66a 90%);
+  font-size: clamp(22px, 5.8vw, 28px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  line-height: 1.15;
+  text-transform: uppercase;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+/* Cantidad protagonista (Texto masivo: "3 ML", "5 ML" o "DE DESCUENTO") */
+.prize-title-main {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 9.5vw, 44px);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  margin-top: 2px;
+  background: linear-gradient(135deg, #ffffff 10%, #fff2d6 35%, #f6e09a 65%, #c8a66a 95%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 14px rgba(246, 224, 154, 0.7));
+}
+
+/* Efecto 2: Barrido de luz diagonal que recorre la caja UNA SOLA VEZ */
+.prize-shine-sweep {
+  position: absolute;
+  top: 0;
+  left: -140%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.45) 48%,
+    rgba(246, 224, 154, 0.7) 52%,
+    transparent 70%
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+}
+
+.prize-highlight.is-revealed .prize-shine-sweep {
+  animation: singleShineSweep 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.35s forwards;
+}
+
+@keyframes singleShineSweep {
+  0% {
+    left: -140%;
+    opacity: 0.85;
+  }
+  100% {
+    left: 200%;
+    opacity: 0;
+  }
+}
+
+/* Insignia "PREMIO MAYOR" para el beneficio de descuento S/ 10 */
+.prize-highlight-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #12151d;
+  background: linear-gradient(135deg, #ffffff 0%, #fff2d6 40%, #e8d5ac 100%);
+  border-radius: var(--radius-full);
+  padding: 3px 12px;
   margin-bottom: 8px;
-  line-height: 1.25;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 12px rgba(246, 224, 154, 0.6);
+}
+
+/* Variaciones temáticas por premio */
+.result-card[data-prize-type="decant_3ml"] .prize-highlight {
+  border-color: #d4a44c;
+  box-shadow: 0 0 25px rgba(212, 164, 76, 0.4), inset 0 0 20px rgba(212, 164, 76, 0.18), 0 8px 30px rgba(0, 0, 0, 0.7);
+}
+
+.result-card[data-prize-type="decant_5ml"] .prize-highlight {
+  border-color: #f6e09a;
+  background: linear-gradient(145deg, #322814 0%, #1a150e 50%, #281e0e 100%);
+  box-shadow: 0 0 30px rgba(246, 224, 154, 0.5), inset 0 0 22px rgba(246, 224, 154, 0.22), 0 8px 30px rgba(0, 0, 0, 0.7);
+}
+
+/* PREMIO DE MAYOR VALOR: S/ 10 DE DESCUENTO (Máxima luminosidad y halo) */
+.result-card[data-prize-type="discount_10"] .prize-highlight {
+  border: 2.5px solid #f6e09a;
+  background: linear-gradient(145deg, #3d3016 0%, #1e170d 50%, #302410 100%);
+  box-shadow: 0 0 38px rgba(246, 224, 154, 0.65), 
+              inset 0 0 25px rgba(246, 224, 154, 0.3), 
+              0 10px 35px rgba(0, 0, 0, 0.8);
+}
+
+.result-card[data-prize-type="discount_10"] .prize-title-prefix {
+  font-size: clamp(36px, 10vw, 46px);
+  font-weight: 800;
+  color: #fff2d6;
+  background: linear-gradient(135deg, #ffffff 10%, #fff2d6 40%, #f6e09a 75%, #d8bc7e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 14px rgba(246, 224, 154, 0.8));
+}
+
+.result-card[data-prize-type="discount_10"] .prize-title-main {
+  font-size: clamp(20px, 5.2vw, 26px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
 }
 
 .result-description {
@@ -851,19 +1323,21 @@ body::before {
 /* Marco del código QR */
 .qr-frame {
   background: #ffffff;
-  padding: 12px;
+  padding: 14px;
   border-radius: var(--radius-md);
   display: inline-block;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 255, 255, 0.2);
-  margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 255, 255, 0.15);
+  margin-bottom: 14px;
 }
 
 .qr-code-display {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 170px;
-  height: 170px;
+  width: 200px;
+  height: 200px;
+  max-width: 62vw;
+  max-height: 62vw;
 }
 
 .qr-code-display svg,
@@ -921,6 +1395,179 @@ body::before {
   width: 14px;
   height: 14px;
   fill: currentColor;
+}
+
+.btn-modal-close {
+  background: transparent;
+  border: 1px solid rgba(200, 166, 106, 0.28);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 9px 18px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--trans-fast);
+}
+
+.btn-modal-close:hover,
+.btn-modal-close:focus-visible {
+  color: #ffffff;
+  border-color: var(--gold-400);
+  background: rgba(200, 166, 106, 0.12);
+  outline: none;
+}
+
+.btn-modal-close:active {
+  transform: translateY(1px);
+}
+
+/* --------------------------------------------------------------------------
+   9.5 MODAL DE INFORMACIÓN DE PREMIOS Y PROBABILIDADES
+   -------------------------------------------------------------------------- */
+.info-modal-card {
+  max-width: 410px;
+}
+
+.info-modal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info-header-icon {
+  width: 26px;
+  height: 26px;
+  color: var(--gold-400);
+  margin-bottom: 6px;
+  filter: drop-shadow(0 0 6px var(--gold-glow));
+}
+
+.prizes-info-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin: 14px 0 16px 0;
+  padding: 0;
+}
+
+.prize-info-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(20, 24, 32, 0.7);
+  border: 1px solid rgba(200, 166, 106, 0.22);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  text-align: left;
+  transition: all var(--trans-fast);
+}
+
+.prize-info-icon-col {
+  flex-shrink: 0;
+}
+
+.prize-info-badge-vol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: rgba(200, 166, 106, 0.12);
+  border: 1px solid rgba(200, 166, 106, 0.28);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-200);
+}
+
+.prize-info-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prize-info-name {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.25;
+}
+
+.prize-info-desc {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+.prize-info-prob {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold-300);
+  background: rgba(14, 16, 21, 0.8);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(200, 166, 106, 0.2);
+}
+
+/* Resaltado del premio de mayor valor (S/ 10 de descuento) */
+.prize-info-item.prize-info-featured {
+  background: linear-gradient(135deg, rgba(200, 166, 106, 0.2) 0%, rgba(35, 42, 56, 0.85) 60%, rgba(200, 166, 106, 0.12) 100%);
+  border: 1.5px solid var(--gold-border-bright);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), 0 0 22px rgba(200, 166, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  padding-top: 18px;
+}
+
+.prize-featured-ribbon {
+  position: absolute;
+  top: -8px;
+  right: 14px;
+  background: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-600) 100%);
+  color: #0e1015;
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 10px var(--gold-glow);
+  text-transform: uppercase;
+}
+
+.prize-info-badge-vol.gold-badge {
+  background: radial-gradient(circle, rgba(232, 213, 172, 0.3) 0%, rgba(200, 166, 106, 0.15) 100%);
+  border-color: var(--gold-200);
+  color: #ffffff;
+  text-shadow: 0 0 8px var(--gold-glow);
+}
+
+.prize-info-name.featured-name {
+  color: var(--gold-100);
+  font-weight: 700;
+}
+
+.prize-info-prob.featured-prob {
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(200, 166, 106, 0.4) 0%, rgba(14, 16, 21, 0.9) 100%);
+  border-color: var(--gold-200);
+  box-shadow: 0 0 12px var(--gold-glow);
+}
+
+.prizes-disclaimer {
+  font-size: 0.74rem;
+  color: var(--gold-300);
+  letter-spacing: 0.02em;
+  margin-bottom: 14px;
+  font-weight: 500;
 }
 
 /* Toast flotante de confirmación */
@@ -1122,3 +1769,260 @@ body::before {
     height: 46px;
   }
 }
+
+/* ==========================================================================
+   ACTUALIZACIÓN 06: CAPA DE EFECTOS CINEMÁTICOS Y ESFERA VIAJERA
+   ========================================================================== */
+.fx-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 180;
+  overflow: hidden;
+}
+
+/* Esfera luminosa que viaja desde el frasco hacia el centro de la pantalla */
+.flying-prize-orb {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  margin-top: -13px;
+  margin-left: -13px;
+  pointer-events: none;
+  z-index: 190;
+  will-change: transform, opacity;
+}
+
+.flying-orb-core {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 20%, #fff2d6 50%, #f6e09a 75%, #c8a66a 100%);
+  box-shadow: 0 0 14px #ffffff,
+              0 0 28px rgba(246, 224, 154, 0.95),
+              0 0 45px rgba(200, 166, 106, 0.85);
+}
+
+.flying-orb-glow {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(246, 224, 154, 0.75) 0%, rgba(200, 166, 106, 0.35) 50%, transparent 75%);
+  animation: orbHaloPulse 0.35s ease-in-out infinite alternate;
+}
+
+.flying-orb-sparkle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: 15px;
+  line-height: 1;
+  text-shadow: 0 0 8px #fff8e7;
+  animation: spinSparkle 0.7s linear infinite;
+}
+
+@keyframes orbHaloPulse {
+  0% { transform: scale(0.9); opacity: 0.75; }
+  100% { transform: scale(1.35); opacity: 1; }
+}
+
+@keyframes spinSparkle {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Partículas de estela que deja la esfera durante el trayecto */
+.flying-trail-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 185;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 25%, #f6e09a 75%, transparent 100%);
+  box-shadow: 0 0 12px rgba(246, 224, 154, 0.95);
+  animation: trailFade 0.5s ease-out forwards;
+}
+
+@keyframes trailFade {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.15);
+    opacity: 0;
+  }
+}
+
+/* Chispas que brotan del cuello del frasco */
+.neck-spark-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 186;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 8px #f6e09a, 0 0 16px rgba(200, 166, 106, 0.8);
+  animation: neckSparkBurst 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes neckSparkBurst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, -30px))) scale(0.2);
+  }
+}
+
+/* Destello en el centro de llegada al fusionarse con el modal */
+.arrival-flash {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  margin-top: -70px;
+  margin-left: -70px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, rgba(246, 224, 154, 0.95) 40%, rgba(200, 166, 106, 0.4) 70%, transparent 90%);
+  box-shadow: 0 0 60px rgba(255, 245, 224, 1), 0 0 120px rgba(212, 164, 76, 0.85);
+  pointer-events: none;
+  z-index: 195;
+  animation: arrivalBurst 0.48s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes arrivalBurst {
+  0% {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(2.6);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(4.2);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   ACTUALIZACIÓN 05.1: CAPA Y PARTÍCULAS DE FUEGOS ARTIFICIALES (CELEBRACIÓN)
+   Z-index 250: Superior al modal y visible exactamente en el viewport
+   ========================================================================== */
+.fireworks-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 250;
+  overflow: visible;
+}
+
+/* Onda expansiva de cada explosión de fuegos artificiales */
+.firework-ring {
+  position: fixed;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  margin-left: -12px;
+  border-radius: 50%;
+  border: 2px solid rgba(246, 224, 154, 0.95);
+  box-shadow: 0 0 20px rgba(246, 224, 154, 0.85);
+  pointer-events: none;
+  animation: fireworkRingExpand 0.7s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes fireworkRingExpand {
+  0% {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3.8);
+    opacity: 0;
+  }
+}
+
+/* Destello central del estallido */
+.firework-flash {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  margin-top: -20px;
+  margin-left: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 25%, #f6e09a 70%, transparent 100%);
+  box-shadow: 0 0 24px #ffffff, 0 0 45px rgba(246, 224, 154, 0.95);
+  pointer-events: none;
+  animation: fireworkFlashPop 0.42s ease-out forwards;
+}
+
+@keyframes fireworkFlashPop {
+  0% {
+    transform: scale(0.3);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* Chispas y partículas que se expanden radialmente y caen con gravedad suave */
+.firework-spark {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 260;
+  animation: fireworkSparkBurst 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fireworkSparkBurst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx) * 1.15), calc(-50% + var(--dy) * 1.15 + 24px)) scale(0.2);
+  }
+}
+
+/* ==========================================================================
+   ACCESIBILIDAD: PREFERS-REDUCED-MOTION
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .bottle-cap-group,
+  .bottle-neck-aura,
+  .flying-prize-orb,
+  .flying-trail-particle,
+  .neck-spark-particle,
+  .arrival-flash,
+  .celebration-canvas,
+  .prize-highlight.is-revealed,
+  .firework-ring,
+  .firework-flash,
+  .firework-spark {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .prize-shine-sweep {
+    display: none !important;
+  }
+}
+

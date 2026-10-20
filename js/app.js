@@ -10,17 +10,24 @@
 /* --------------------------------------------------------------------------
    1. CONFIGURACIÓN CENTRALIZADA DEL JUEGO (FÁCILMENTE EDITABLE)
    -------------------------------------------------------------------------- */
+// URL oficial y definitiva del juego publicado en GitHub Pages
+const GAME_URL = "https://xlucasxgrx.github.io/RULETA-DUNES/";
+
 const GAME_CONFIG = {
-  // Nombre de la marca o perfumería
+  // Título y subtítulo oficiales de la experiencia
+  gameTitle: 'REGALITO DEL TÍO DUNES',
+  gameSubtitle: '¡El Tío Dunes tiene una sorpresa para ti!',
   brandName: 'DUNES PARFUMS',
   brandTagline: 'Perfumes Originales Sellados',
 
-  // URL pública de respaldo para pruebas locales (se usa automáticamente window.location.href en producción)
-  // Al desplegar en GitHub Pages, el código QR toma automáticamente la URL pública real.
-  publicUrlFallback: 'https://lucas.github.io/ruleta-dunes/',
+  // URL oficial centralizada
+  officialUrl: GAME_URL,
 
   // Duración de la animación de revelación en milisegundos (1.3s = dentro del rango de 1 a 2 segundos)
   revealDurationMs: 1300,
+
+  // Duración del barajado automático en milisegundos (1.9s = dentro del rango de 1.5 a 2.5 segundos)
+  shuffleDurationMs: 1900,
 
   // Activar respuesta háptica en celulares compatibles
   enableHaptics: true,
@@ -35,8 +42,9 @@ const GAME_CONFIG = {
       id: 'decant_3ml',
       type: 'decant_3ml',
       name: 'Decant de 3 ml',
-      badge: '3 ML • MISTERIO',
+      badge: '3 ML · SORPRESA',
       title: '¡FELICIDADES!',
+      highlightTitle: 'DECANT DE 3 ML',
       subtitle: 'Ganaste un decant de 3 ml',
       description: 'Fragancia sorpresa seleccionada por nuestra perfumería.',
       weight: 70, // 70% de probabilidad
@@ -46,8 +54,9 @@ const GAME_CONFIG = {
       id: 'decant_5ml',
       type: 'decant_5ml',
       name: 'Decant de 5 ml',
-      badge: '5 ML • ESPECIAL',
+      badge: '5 ML · ESPECIAL',
       title: '¡FELICIDADES!',
+      highlightTitle: 'DECANT DE 5 ML',
       subtitle: 'Ganaste un decant de 5 ml',
       description: 'Una nueva fragancia te espera.',
       weight: 20, // 20% de probabilidad
@@ -57,8 +66,9 @@ const GAME_CONFIG = {
       id: 'discount_10',
       type: 'discount_10',
       name: 'S/ 10 de descuento',
-      badge: 'BENEFICIO EXCLUSIVO',
+      badge: 'S/ 10 · BENEFICIO',
       title: '¡FELICIDADES!',
+      highlightTitle: 'S/ 10 DE DESCUENTO',
       subtitle: 'Ganaste S/ 10 de descuento',
       description: 'Para tu próxima compra. Coordina tu beneficio con el vendedor.',
       weight: 10, // 10% de probabilidad
@@ -71,12 +81,62 @@ const GAME_CONFIG = {
    2. ESTADO DE LA APLICACIÓN
    -------------------------------------------------------------------------- */
 const AppState = {
-  // Estados posibles: 'IDLE' | 'ANIMATING' | 'REVEALED'
-  status: 'IDLE',
+  // Estados posibles: 'INTRO' | 'SHUFFLING' | 'IDLE' | 'OPENING' | 'TRAVELING' | 'REVEALED'
+  status: 'INTRO',
   selectedBottleIndex: null,
   currentPrize: null,
-  lastFocusedElement: null
+  lastFocusedElement: null,
+  celebrationAnimId: null,
+  activeTimers: []
 };
+
+/**
+ * Registra un temporizador en el estado para cancelarlo de forma segura al reiniciar
+ */
+function registerTimer(fn, delay) {
+  const id = setTimeout(() => {
+    AppState.activeTimers = AppState.activeTimers.filter((t) => t !== id);
+    fn();
+  }, delay);
+  AppState.activeTimers.push(id);
+  return id;
+}
+
+/**
+ * Limpia todos los temporizadores, fuegos artificiales, canvas y partículas activas
+ */
+function clearAllActiveFx() {
+  AppState.activeTimers.forEach((id) => clearTimeout(id));
+  AppState.activeTimers = [];
+
+  if (AppState.celebrationAnimId) {
+    cancelAnimationFrame(AppState.celebrationAnimId);
+    AppState.celebrationAnimId = null;
+  }
+
+  const fxLayer = document.getElementById('fxLayer');
+  if (fxLayer) {
+    fxLayer.innerHTML = '';
+  }
+
+  const fireworksLayer = document.getElementById('fireworksLayer');
+  if (fireworksLayer) {
+    fireworksLayer.innerHTML = '';
+  }
+
+  const celebrationCanvas = document.getElementById('celebrationCanvas');
+  if (celebrationCanvas) {
+    const ctx = celebrationCanvas.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, celebrationCanvas.width, celebrationCanvas.height);
+    }
+  }
+
+  const prizeHighlightBox = document.getElementById('prizeHighlightBox');
+  if (prizeHighlightBox) {
+    prizeHighlightBox.classList.remove('is-revealed');
+  }
+}
 
 /* --------------------------------------------------------------------------
    3. GENERADOR DE NÚMEROS ALEATORIOS CRIPTOGRÁFICOS Y SELECCIÓN PONDERADA
@@ -247,8 +307,168 @@ function getPrizeSvg(prizeType) {
 }
 
 /* --------------------------------------------------------------------------
-   6. CONTROLADOR DE INTERACCIÓN CON LOS FRASCOS
+   6. CONTROLADOR DE INTERACCIÓN Y BARAJADO DE FRASCOS
    -------------------------------------------------------------------------- */
+
+/**
+ * Ejecuta la animación de barajado automático de los tres frascos.
+ * Intercambia posiciones de forma real y visual mediante Web Animations API / CSS transforms,
+ * calculando distancias exactas en tiempo de ejecución para adaptarse a cualquier ancho de pantalla.
+ * @param {Function} onComplete Callback opcional al finalizar el barajado
+ */
+function runBottleShuffleAnimation(onComplete) {
+  const bottleCards = Array.from(document.querySelectorAll('.bottle-card'));
+  const gameArea = document.getElementById('gameArea');
+  const instructionText = document.getElementById('instructionText');
+  const instructionBox = document.getElementById('instructionBox');
+
+  if (bottleCards.length !== 3) {
+    AppState.status = 'IDLE';
+    if (typeof onComplete === 'function') onComplete();
+    return;
+  }
+
+  // Comprobar preferencia de movimiento reducido
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) {
+    bottleCards.forEach((b) => {
+      b.disabled = false;
+      b.removeAttribute('aria-disabled');
+      b.classList.remove('is-selected', 'is-dimmed');
+    });
+    if (instructionText) {
+      instructionText.textContent = '¡Elige tu regalito!';
+    }
+    if (instructionBox) {
+      instructionBox.classList.add('is-ready-pulse');
+      setTimeout(() => instructionBox.classList.remove('is-ready-pulse'), 1500);
+    }
+    AppState.status = 'IDLE';
+    if (typeof onComplete === 'function') onComplete();
+    return;
+  }
+
+  AppState.status = 'SHUFFLING';
+  if (gameArea) {
+    gameArea.classList.add('is-shuffling');
+  }
+
+  // 1. Bloquear interacción en todos los frascos durante el barajado
+  bottleCards.forEach((b) => {
+    b.disabled = true;
+    b.setAttribute('aria-disabled', 'true');
+    b.classList.remove('is-selected', 'is-dimmed');
+  });
+
+  if (instructionText) {
+    instructionText.textContent = 'Mezclando los frascos de la suerte...';
+  }
+
+  // 2. Calcular distancia horizontal real en píxeles entre columnas adyacentes
+  const rect0 = bottleCards[0].getBoundingClientRect();
+  const rect1 = bottleCards[1].getBoundingClientRect();
+  const d = Math.round(rect1.left - rect0.left);
+  const dist = d > 20 ? d : 110;
+
+  playLuxuryChime('select');
+  triggerHaptic([15, 20]);
+
+  // Duración configurada (1.9s)
+  const duration = GAME_CONFIG.shuffleDurationMs || 1900;
+
+  // Keyframes con desplazamientos horizontales, arcos verticales y profundidad (escala/z-index):
+  // Frasco 1 (Izquierdo): Se desplaza al centro por arriba (+dist, -12px), luego a la derecha (+2*dist, +6px), y regresa fluido
+  const keyframes1 = [
+    { transform: 'translate(0px, 0px) scale(1)', zIndex: 1 },
+    { transform: 'translate(0px, -4px) scale(1.02)', zIndex: 2, offset: 0.12 },
+    { transform: `translate(${dist}px, -12px) scale(1.06)`, zIndex: 5, offset: 0.42 },
+    { transform: `translate(${2 * dist}px, 6px) scale(0.95)`, zIndex: 2, offset: 0.72 },
+    { transform: 'translate(0px, 0px) scale(1)', zIndex: 1, offset: 1.0 }
+  ];
+
+  // Frasco 2 (Centro): Pasa a la izquierda (-dist, +6px), flota y regresa fluido
+  const keyframes2 = [
+    { transform: 'translate(0px, 0px) scale(1)', zIndex: 1 },
+    { transform: 'translate(0px, -4px) scale(1.02)', zIndex: 2, offset: 0.12 },
+    { transform: `translate(${-dist}px, 6px) scale(0.95)`, zIndex: 2, offset: 0.42 },
+    { transform: `translate(${-dist}px, -4px) scale(1.0)`, zIndex: 3, offset: 0.72 },
+    { transform: 'translate(0px, 0px) scale(1)', zIndex: 1, offset: 1.0 }
+  ];
+
+  // Frasco 3 (Derecha): Anticipa, luego se desplaza al centro (-dist, -12px) por arriba, y regresa fluido
+  const keyframes3 = [
+    { transform: 'translate(0px, 0px) scale(1)', zIndex: 1 },
+    { transform: 'translate(0px, -4px) scale(1.02)', zIndex: 2, offset: 0.12 },
+    { transform: 'translate(0px, 2px) scale(1.0)', zIndex: 3, offset: 0.42 },
+    { transform: `translate(${-dist}px, -12px) scale(1.06)`, zIndex: 5, offset: 0.72 },
+    { transform: 'translate(0px, 0px) scale(1)', zIndex: 1, offset: 1.0 }
+  ];
+
+  const timing = {
+    duration: duration,
+    easing: 'cubic-bezier(0.28, 0.84, 0.42, 1)',
+    fill: 'none'
+  };
+
+  let finished = false;
+  function finishShuffle() {
+    if (finished) return;
+    finished = true;
+
+    bottleCards.forEach((b) => {
+      b.style.transform = '';
+      b.style.zIndex = '';
+      b.classList.remove('is-shuffling-active');
+    });
+
+    if (gameArea) {
+      gameArea.classList.remove('is-shuffling');
+    }
+
+    // Actualizar instrucción al finalizar barajado
+    if (instructionText) {
+      instructionText.textContent = '¡Elige tu regalito!';
+    }
+    if (instructionBox) {
+      instructionBox.classList.add('is-ready-pulse');
+      setTimeout(() => instructionBox.classList.remove('is-ready-pulse'), 1800);
+    }
+
+    triggerHaptic([25]);
+
+    // Habilitar todos los frascos para que el cliente pueda jugar
+    bottleCards.forEach((b) => {
+      b.disabled = false;
+      b.removeAttribute('aria-disabled');
+    });
+
+    AppState.status = 'IDLE';
+
+    if (typeof onComplete === 'function') {
+      onComplete();
+    }
+  }
+
+  try {
+    if (typeof bottleCards[0].animate === 'function') {
+      bottleCards.forEach(b => b.classList.add('is-shuffling-active'));
+      const a1 = bottleCards[0].animate(keyframes1, timing);
+      const a2 = bottleCards[1].animate(keyframes2, timing);
+      const a3 = bottleCards[2].animate(keyframes3, timing);
+
+      Promise.all([a1.finished, a2.finished, a3.finished])
+        .then(finishShuffle)
+        .catch(finishShuffle);
+
+      // Respaldo de tiempo de seguridad
+      setTimeout(finishShuffle, duration + 100);
+    } else {
+      setTimeout(finishShuffle, duration);
+    }
+  } catch (err) {
+    setTimeout(finishShuffle, duration);
+  }
+}
 
 /**
  * Inicializa los eventos de interacción de la página
@@ -260,6 +480,14 @@ function initGame() {
   const btnNewGame = document.getElementById('btnNewGame');
   const bottlesHelper = document.getElementById('bottlesHelper');
   const instructionText = document.getElementById('instructionText');
+  const introSplash = document.getElementById('introSplash');
+
+  // Inicializar estado en INTRO y frascos deshabilitados
+  AppState.status = 'INTRO';
+  bottleCards.forEach((b) => {
+    b.disabled = true;
+    b.setAttribute('aria-disabled', 'true');
+  });
 
   // Asignar eventos de clic a cada uno de los 3 frascos
   bottleCards.forEach((bottle) => {
@@ -287,26 +515,295 @@ function initGame() {
 
   // Inicializar Modal QR
   initQrModal();
+
+  // Inicializar Modal de Información de Premios
+  initInfoModal();
+
+  // Secuencia inicial: Presentación animada (aprox. 1 segundo) seguida del barajado automático
+  if (introSplash) {
+    setTimeout(() => {
+      introSplash.classList.add('is-hidden');
+      setTimeout(() => {
+        introSplash.hidden = true;
+        // Iniciar barajado de los tres frascos
+        runBottleShuffleAnimation();
+      }, 450);
+    }, 1050);
+  } else {
+    runBottleShuffleAnimation();
+  }
 }
 
 /**
- * Gestiona la selección de un frasco
+ * Emite chispas doradas desde el cuello del frasco seleccionado
+ */
+function emitNeckSparks(selectedBottle) {
+  const fxLayer = document.getElementById('fxLayer');
+  if (!fxLayer || !selectedBottle) return;
+
+  const rect = selectedBottle.getBoundingClientRect();
+  const originX = Math.round(rect.left + rect.width * 0.5);
+  const originY = Math.round(rect.top + rect.height * 0.22);
+
+  const sparkCount = 7;
+  for (let i = 0; i < sparkCount; i++) {
+    const spark = document.createElement('div');
+    spark.className = 'neck-spark-particle';
+    const angle = ((Math.PI * 0.8) / (sparkCount - 1)) * i - (Math.PI * 0.9);
+    const distance = 24 + Math.random() * 26;
+    const dx = Math.round(Math.cos(angle) * distance);
+    const dy = Math.round(Math.sin(angle) * distance);
+    const size = 3 + Math.random() * 3.5;
+
+    spark.style.left = `${originX}px`;
+    spark.style.top = `${originY}px`;
+    spark.style.width = `${size}px`;
+    spark.style.height = `${size}px`;
+    spark.style.setProperty('--dx', `${dx}px`);
+    spark.style.setProperty('--dy', `${dy}px`);
+
+    fxLayer.appendChild(spark);
+    setTimeout(() => {
+      if (spark.parentNode) spark.parentNode.removeChild(spark);
+    }, 680);
+  }
+}
+
+/**
+ * Lanza la esfera luminosa viajera desde el frasco hacia el centro de la pantalla
+ */
+function launchTravelingOrb(selectedBottle, onArrival) {
+  const fxLayer = document.getElementById('fxLayer');
+  if (!fxLayer || !selectedBottle) {
+    if (typeof onArrival === 'function') onArrival();
+    return;
+  }
+
+  AppState.status = 'TRAVELING';
+
+  // 1. Origen dinámico: Cuello del frasco seleccionado en coordenadas del viewport
+  const rect = selectedBottle.getBoundingClientRect();
+  const startX = Math.round(rect.left + rect.width * 0.5);
+  const startY = Math.round(rect.top + rect.height * 0.22);
+
+  // 2. Destino dinámico: Centro del viewport donde aterriza el modal
+  const targetX = Math.round(window.innerWidth * 0.5);
+  const targetY = Math.round(window.innerHeight * 0.44);
+
+  // 3. Trayectoria curva suave con arco elevado
+  const deltaX = targetX - startX;
+  const isLeft = deltaX > 25;
+  const isRight = deltaX < -25;
+  const midX = Math.round(startX + deltaX * 0.52 + (isLeft ? -18 : (isRight ? 18 : 0)));
+  const arcElevation = window.innerWidth < 600 ? 50 : 80;
+  const midY = Math.round(Math.min(startY, targetY) - arcElevation);
+
+  // Crear la esfera luminosa
+  const orb = document.createElement('div');
+  orb.className = 'flying-prize-orb';
+  orb.innerHTML = `
+    <div class="flying-orb-core"></div>
+    <div class="flying-orb-glow"></div>
+    <div class="flying-orb-sparkle">✦</div>
+  `;
+  fxLayer.appendChild(orb);
+
+  // Estela de micropartículas doradas a lo largo de la trayectoria
+  let trailStep = 0;
+  const trailInterval = setInterval(() => {
+    trailStep++;
+    const t = trailStep / 6;
+    const curX = (1 - t) * (1 - t) * startX + 2 * (1 - t) * t * midX + t * t * targetX;
+    const curY = (1 - t) * (1 - t) * startY + 2 * (1 - t) * t * midY + t * t * targetY;
+
+    const trail = document.createElement('div');
+    trail.className = 'flying-trail-particle';
+    const sz = Math.max(3, 9 - trailStep);
+    trail.style.width = `${sz}px`;
+    trail.style.height = `${sz}px`;
+    trail.style.left = `${Math.round(curX)}px`;
+    trail.style.top = `${Math.round(curY)}px`;
+    fxLayer.appendChild(trail);
+
+    setTimeout(() => {
+      if (trail.parentNode) trail.parentNode.removeChild(trail);
+    }, 520);
+
+    if (trailStep >= 6) {
+      clearInterval(trailInterval);
+    }
+  }, 90);
+
+  // Keyframes suaves de la esfera
+  const keyframes = [
+    { transform: `translate(${startX}px, ${startY}px) scale(0.35)`, opacity: 0 },
+    { transform: `translate(${startX}px, ${startY - 18}px) scale(1.15)`, opacity: 1, offset: 0.18 },
+    { transform: `translate(${midX}px, ${midY}px) scale(1.35)`, opacity: 1, offset: 0.55 },
+    { transform: `translate(${targetX}px, ${targetY}px) scale(1.6)`, opacity: 1, offset: 0.90 },
+    { transform: `translate(${targetX}px, ${targetY}px) scale(2.8)`, opacity: 0, offset: 1.0 }
+  ];
+
+  const timing = {
+    duration: 580,
+    easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+    fill: 'forwards'
+  };
+
+  let finished = false;
+  function handleArrival() {
+    if (finished) return;
+    finished = true;
+    clearInterval(trailInterval);
+    if (orb.parentNode) orb.parentNode.removeChild(orb);
+
+    // Destello de llegada en el centro
+    const flash = document.createElement('div');
+    flash.className = 'arrival-flash';
+    flash.style.left = `${targetX}px`;
+    flash.style.top = `${targetY}px`;
+    fxLayer.appendChild(flash);
+    setTimeout(() => {
+      if (flash.parentNode) flash.parentNode.removeChild(flash);
+    }, 500);
+
+    if (typeof onArrival === 'function') {
+      onArrival();
+    }
+  }
+
+  try {
+    if (typeof orb.animate === 'function') {
+      const anim = orb.animate(keyframes, timing);
+      anim.finished.then(handleArrival).catch(handleArrival);
+      registerTimer(handleArrival, 650);
+    } else {
+      registerTimer(handleArrival, 580);
+    }
+  } catch (err) {
+    registerTimer(handleArrival, 580);
+  }
+}
+
+/**
+ * Dispara una explosión individual de fuegos artificiales con onda, destello y partículas
+ */
+function createFireworkBurst(layer, originX, originY, isSpecial) {
+  if (!layer) return;
+
+  // 1. Onda expansiva dorada
+  const ring = document.createElement('div');
+  ring.className = 'firework-ring';
+  ring.style.left = `${originX}px`;
+  ring.style.top = `${originY}px`;
+  layer.appendChild(ring);
+  setTimeout(() => {
+    if (ring.parentNode) ring.parentNode.removeChild(ring);
+  }, 750);
+
+  // 2. Destello nuclear central
+  const flash = document.createElement('div');
+  flash.className = 'firework-flash';
+  flash.style.left = `${originX}px`;
+  flash.style.top = `${originY}px`;
+  layer.appendChild(flash);
+  setTimeout(() => {
+    if (flash.parentNode) flash.parentNode.removeChild(flash);
+  }, 450);
+
+  // 3. Chispas radiales que salen a gran velocidad y caen suavemente con gravedad
+  const particleCount = isSpecial ? 22 : 18;
+  const colors = isSpecial
+    ? ['#FFFFFF', '#FFF5E0', '#F6E09A', '#FFE8A3', '#D4A44C']
+    : ['#FFFFFF', '#FFF8E7', '#F6E09A', '#E8D5AC', '#C8A66A'];
+
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('span');
+    particle.className = 'firework-spark';
+    const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.35;
+    const distance = 35 + Math.random() * (isSpecial ? 48 : 40);
+    const dx = Math.round(Math.cos(angle) * distance);
+    const dy = Math.round(Math.sin(angle) * distance);
+    const color = colors[i % colors.length];
+    const size = 3.5 + Math.random() * 3.5;
+    const dur = 0.85 + Math.random() * 0.45;
+
+    particle.style.left = `${originX}px`;
+    particle.style.top = `${originY}px`;
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    particle.style.backgroundColor = color;
+    particle.style.boxShadow = `0 0 10px ${color}, 0 0 18px rgba(246, 224, 154, 0.85)`;
+    particle.style.setProperty('--dx', `${dx}px`);
+    particle.style.setProperty('--dy', `${dy}px`);
+    particle.style.animationDuration = `${dur}s`;
+
+    layer.appendChild(particle);
+    setTimeout(() => {
+      if (particle.parentNode) particle.parentNode.removeChild(particle);
+    }, dur * 1000 + 50);
+  }
+}
+
+/**
+ * Lanza la celebración con 3 explosiones de fuegos artificiales alrededor del recuadro
+ */
+function launchFireworksCelebration(prizeType) {
+  const layer = document.getElementById('fireworksLayer');
+  if (!layer) return;
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) return;
+
+  layer.innerHTML = '';
+
+  const prizeBox = document.getElementById('prizeHighlightBox');
+  if (!prizeBox) return;
+
+  const rect = prizeBox.getBoundingClientRect();
+  const isSpecial = prizeType === 'discount_10';
+
+  // Coordenadas exactas alrededor del recuadro destacado
+  const leftX = Math.round(rect.left + 24);
+  const leftY = Math.round(rect.top + 8);
+  const rightX = Math.round(rect.right - 24);
+  const rightY = Math.round(rect.top + 8);
+  const centerX = Math.round(rect.left + rect.width * 0.5);
+  const centerY = Math.round(rect.top - 28);
+
+  // Explosión 1: Superior izquierdo del recuadro
+  registerTimer(() => {
+    createFireworkBurst(layer, leftX, leftY, isSpecial);
+  }, 60);
+
+  // Explosión 2: Superior derecho del recuadro
+  registerTimer(() => {
+    createFireworkBurst(layer, rightX, rightY, isSpecial);
+  }, 220);
+
+  // Explosión 3: Superior central arriba del recuadro
+  registerTimer(() => {
+    createFireworkBurst(layer, centerX, centerY, isSpecial);
+  }, 380);
+}
+
+/**
+ * Gestiona la selección de un frasco y orquesta la secuencia cinematográfica
  */
 function handleBottleSelect(selectedBottle, allBottles, gameArea, resultSection, bottlesHelper, instructionText) {
-  // 1. Bloqueo estricto: Si ya se está jugando o ya se reveló, evitar pulsaciones repetidas
+  // 1. Bloqueo estricto: Si ya se está jugando, abriendo o ya se reveló, evitar pulsaciones repetidas
   if (AppState.status !== 'IDLE') {
     return;
   }
 
-  // Cambiar estado a ANIMANDO
-  AppState.status = 'ANIMATING';
+  // Cambiar estado a OPENING
+  AppState.status = 'OPENING';
   AppState.selectedBottleIndex = parseInt(selectedBottle.getAttribute('data-bottle-index'), 10);
 
   // Respuesta táctil y sonora inmediata
   triggerHaptic([20, 30]);
   playLuxuryChime('select');
 
-  // 2. Inmediatamente deshabilitar todos los frascos para evitar clics concurrentes
+  // 2. Inmediatamente deshabilitar todos los frascos para impedir selecciones simultáneas
   allBottles.forEach((b) => {
     b.disabled = true;
     b.setAttribute('aria-disabled', 'true');
@@ -317,10 +814,10 @@ function handleBottleSelect(selectedBottle, allBottles, gameArea, resultSection,
     gameArea.classList.add('is-animating');
   }
 
-  // 3. Resaltar el frasco seleccionado y atenuar los otros dos
+  // 3. Resaltar el frasco seleccionado y atenuar suavemente los otros dos
   allBottles.forEach((b) => {
     if (b === selectedBottle) {
-      b.classList.add('is-selected');
+      b.classList.add('is-selected', 'is-opening');
     } else {
       b.classList.add('is-dimmed');
     }
@@ -331,22 +828,39 @@ function handleBottleSelect(selectedBottle, allBottles, gameArea, resultSection,
     bottlesHelper.classList.add('is-hidden');
   }
 
-  // Actualizar instrucción durante la revelación
+  // Actualizar instrucción durante la apertura
   if (instructionText) {
-    instructionText.textContent = 'Revelando tu aroma de la suerte...';
+    instructionText.textContent = '¡Abriendo tu aroma de la suerte!...';
   }
 
-  // 4. Seleccionar el premio según las probabilidades configuradas
+  // 4. Seleccionar el premio según las probabilidades configuradas (una sola vez por partida)
   AppState.currentPrize = selectWeightedPrize(GAME_CONFIG.prizes);
 
-  // 5. Esperar la duración de la animación (entre 1 y 2 segundos) y mostrar el resultado
-  setTimeout(() => {
-    revealPrize(AppState.currentPrize, resultSection, instructionText);
-  }, GAME_CONFIG.revealDurationMs);
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) {
+    registerTimer(() => {
+      revealPrize(AppState.currentPrize, resultSection, instructionText);
+    }, 350);
+    return;
+  }
+
+  // 5. Secuencia cinematográfica sincronizada:
+  // Etapa 2 y 3: Apertura física de tapa + chispas del cuello (a los 280ms)
+  registerTimer(() => {
+    emitNeckSparks(selectedBottle);
+  }, 280);
+
+  // Etapa 4: La esfera de luz emerge y viaja hacia el centro del viewport (a los 460ms)
+  registerTimer(() => {
+    launchTravelingOrb(selectedBottle, () => {
+      // Etapa 5 y 6: Destello de llegada + revelación sincronizada del modal + fuegos artificiales
+      revealPrize(AppState.currentPrize, resultSection, instructionText);
+    });
+  }, 460);
 }
 
 /**
- * Muestra la pantalla de resultados con el premio obtenido
+ * Muestra la pantalla de resultados con el premio obtenido y lanza la celebración
  */
 function revealPrize(prize, resultSection, instructionText) {
   if (!resultSection || !prize) return;
@@ -365,9 +879,12 @@ function revealPrize(prize, resultSection, instructionText) {
   // Elementos internos de la tarjeta de resultados
   const resultCard = resultSection.querySelector('.result-card');
   const resultPrizeEmblem = document.getElementById('resultPrizeEmblem');
-  const resultBadge = document.getElementById('resultBadge');
   const resultCongrats = document.getElementById('resultCongrats');
-  const resultPrizeName = document.getElementById('resultPrizeName');
+  const prizeHighlightBox = document.getElementById('prizeHighlightBox');
+  const prizeHighlightBadge = document.getElementById('prizeHighlightBadge');
+  const prizeTag = document.getElementById('prizeTag');
+  const prizeTitlePrefix = document.getElementById('prizeTitlePrefix');
+  const prizeTitleMain = document.getElementById('prizeTitleMain');
   const resultDescription = document.getElementById('resultDescription');
 
   // Inyectar datos del premio
@@ -379,29 +896,56 @@ function revealPrize(prize, resultSection, instructionText) {
     resultPrizeEmblem.innerHTML = getPrizeSvg(prize.type);
   }
 
-  if (resultBadge) {
-    resultBadge.textContent = prize.badge;
-  }
-
   if (resultCongrats) {
     resultCongrats.textContent = prize.title; // "¡FELICIDADES!"
   }
 
-  if (resultPrizeName) {
-    resultPrizeName.textContent = prize.subtitle; // "Ganaste un decant de 3 ml", etc.
+  if (prizeTag) {
+    prizeTag.textContent = '✦ TU PREMIO ✦';
+  }
+
+  // Configuración del Gran Recuadro Central según FASE 2
+  if (prizeHighlightBox) {
+    prizeHighlightBox.setAttribute('data-prize', prize.type);
+
+    if (prize.type === 'decant_3ml') {
+      if (prizeTitlePrefix) prizeTitlePrefix.textContent = 'DECANT DE';
+      if (prizeTitleMain) prizeTitleMain.textContent = '3 ML';
+      if (prizeHighlightBadge) prizeHighlightBadge.hidden = true;
+    } else if (prize.type === 'decant_5ml') {
+      if (prizeTitlePrefix) prizeTitlePrefix.textContent = 'DECANT DE';
+      if (prizeTitleMain) prizeTitleMain.textContent = '5 ML';
+      if (prizeHighlightBadge) prizeHighlightBadge.hidden = true;
+    } else if (prize.type === 'discount_10') {
+      if (prizeTitlePrefix) prizeTitlePrefix.textContent = 'S/ 10';
+      if (prizeTitleMain) prizeTitleMain.textContent = 'DE DESCUENTO';
+      if (prizeHighlightBadge) prizeHighlightBadge.hidden = false;
+    }
+
+    // Efecto 1 y 2: Entrada luminosa y barrido de luz diagonal único
+    prizeHighlightBox.classList.remove('is-revealed');
+    void prizeHighlightBox.offsetWidth; // Forzar reflow para reiniciar animación
+    prizeHighlightBox.classList.add('is-revealed');
   }
 
   if (resultDescription) {
     resultDescription.textContent = prize.description;
   }
 
-  // Mostrar la sección de resultados
+  // Cerrar modales que estuvieran abiertos para evitar superposiciones
+  closeInfoModal();
+  const qrModal = document.getElementById('qrModal');
+  if (qrModal && !qrModal.hidden) {
+    closeQrModal(qrModal);
+  }
+
+  // Mostrar la sección de resultados (modal centrado superpuesto)
   resultSection.hidden = false;
 
-  // Desplazar suavemente a la tarjeta de resultados si está fuera del viewport en pantallas pequeñas
-  resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  // FASE 3: Disparar fuegos artificiales reales y notorios en viewport z-index 250
+  launchFireworksCelebration(prize.type);
 
-  // Foco accesible al botón o tarjeta
+  // Foco accesible al botón de nueva partida dentro del modal
   const btnNewGame = document.getElementById('btnNewGame');
   if (btnNewGame) {
     btnNewGame.focus({ preventScroll: true });
@@ -412,6 +956,14 @@ function revealPrize(prize, resultSection, instructionText) {
  * Restablece el juego para una nueva partida con otro cliente
  */
 function resetGame(allBottles, gameArea, resultSection, bottlesHelper, instructionText) {
+  // Evitar restablecer si el juego está actualmente en barajado, apertura o vuelo de la esfera
+  if (AppState.status === 'SHUFFLING' || AppState.status === 'OPENING' || AppState.status === 'TRAVELING') {
+    return;
+  }
+
+  // Limpiar todos los efectos visuales, temporizadores y partículas activas
+  clearAllActiveFx();
+
   // Ocultar sección de resultados
   if (resultSection) {
     resultSection.hidden = true;
@@ -422,11 +974,14 @@ function resetGame(allBottles, gameArea, resultSection, bottlesHelper, instructi
     gameArea.classList.remove('is-animating');
   }
 
-  // Restablecer clases y estados de los frascos
+  // Restablecer clases y tapones de los frascos
   allBottles.forEach((b) => {
-    b.disabled = false;
-    b.removeAttribute('aria-disabled');
-    b.classList.remove('is-selected', 'is-dimmed');
+    b.classList.remove('is-selected', 'is-dimmed', 'is-opening');
+    const cap = b.querySelector('.bottle-cap-group');
+    if (cap) {
+      cap.style.transform = '';
+      cap.style.filter = '';
+    }
   });
 
   // Mostrar nuevamente la ayuda inferior
@@ -434,23 +989,16 @@ function resetGame(allBottles, gameArea, resultSection, bottlesHelper, instructi
     bottlesHelper.classList.remove('is-hidden');
   }
 
-  // Restaurar instrucción inicial
-  if (instructionText) {
-    instructionText.textContent = 'Elige uno de los tres frascos y descubre tu regalo.';
-  }
-
-  // Resetear estado
-  AppState.status = 'IDLE';
+  // Resetear variables de premio
   AppState.selectedBottleIndex = null;
   AppState.currentPrize = null;
 
-  // Devolver foco al primer frasco para usabilidad con teclado
-  if (allBottles.length > 0) {
-    allBottles[0].focus();
-  }
-
-  // Respuesta táctil suave al reiniciar
-  triggerHaptic([15]);
+  // Ejecutar nuevamente la animación de barajado automático para la nueva partida
+  runBottleShuffleAnimation(() => {
+    if (allBottles.length > 0) {
+      allBottles[0].focus();
+    }
+  });
 }
 
 /* --------------------------------------------------------------------------
@@ -458,18 +1006,11 @@ function resetGame(allBottles, gameArea, resultSection, bottlesHelper, instructi
    -------------------------------------------------------------------------- */
 
 /**
- * Determina la URL que debe codificarse en el código QR
+ * Determina la URL que debe codificarse en el código QR y compartirse.
+ * Siempre retorna la URL oficial definitiva de GitHub Pages.
  */
 function getGameUrl() {
-  const currentUrl = window.location.href;
-
-  // Si se abre directamente como archivo local (file://) o localhost,
-  // usar la URL de GitHub Pages configurada en GAME_CONFIG para que el QR sea escaneable desde otros celulares.
-  if (currentUrl.startsWith('file:') || currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1')) {
-    return GAME_CONFIG.publicUrlFallback;
-  }
-
-  return currentUrl;
+  return GAME_URL;
 }
 
 /**
@@ -479,6 +1020,7 @@ function initQrModal() {
   const btnQrTrigger = document.getElementById('btnQrTrigger');
   const qrModal = document.getElementById('qrModal');
   const modalCloseBtn = document.getElementById('modalCloseBtn');
+  const btnModalClose = document.getElementById('btnModalClose');
   const btnCopyUrl = document.getElementById('btnCopyUrl');
   const qrDisplay = document.getElementById('qrCodeDisplay');
   const qrUrlText = document.getElementById('qrUrlText');
@@ -491,9 +1033,16 @@ function initQrModal() {
     openQrModal(qrModal, qrDisplay, qrUrlText, btnQrTrigger);
   });
 
-  // Cerrar con botón X
+  // Cerrar con botón X superior
   if (modalCloseBtn) {
     modalCloseBtn.addEventListener('click', () => {
+      closeQrModal(qrModal);
+    });
+  }
+
+  // Cerrar con botón de texto inferior "Cerrar"
+  if (btnModalClose) {
+    btnModalClose.addEventListener('click', () => {
       closeQrModal(qrModal);
     });
   }
@@ -507,16 +1056,18 @@ function initQrModal() {
 
   // Cerrar con tecla Escape
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && qrModal.classList.contains('is-open')) {
-      closeQrModal(qrModal);
+    if (e.key === 'Escape') {
+      if (qrModal && qrModal.classList.contains('is-open')) {
+        closeQrModal(qrModal);
+      }
+      closeInfoModal();
     }
   });
 
-  // Copiar URL al portapapeles
+  // Copiar URL al portapapeles (utiliza siempre GAME_URL oficial)
   if (btnCopyUrl) {
     btnCopyUrl.addEventListener('click', () => {
-      const targetUrl = getGameUrl();
-      copyToClipboard(targetUrl, toastNotice);
+      copyToClipboard(GAME_URL, toastNotice);
     });
   }
 }
@@ -525,8 +1076,11 @@ function initQrModal() {
  * Abre el modal y renderiza el código QR mediante la librería local qrcode
  */
 function openQrModal(modal, container, urlDisplay, triggerButton) {
+  // Cerrar modal informativo si estuviera abierto
+  closeInfoModal();
+
   AppState.lastFocusedElement = triggerButton;
-  const targetUrl = getGameUrl();
+  const targetUrl = GAME_URL;
 
   // Mostrar URL en texto plano
   if (urlDisplay) {
@@ -541,8 +1095,8 @@ function openQrModal(modal, container, urlDisplay, triggerButton) {
         const qr = window.qrcode(0, 'M');
         qr.addData(targetUrl);
         qr.make();
-        // Genera elemento SVG escalable directamente
-        container.innerHTML = qr.createSvgTag({ scalable: true, margin: 1 });
+        // Genera elemento SVG escalable con margen blanco de protección para lectura inmediata de cámara
+        container.innerHTML = qr.createSvgTag({ scalable: true, margin: 2 });
       } else {
         container.innerHTML = `<p style="font-size:0.8rem;color:#b8b4ae;">${targetUrl}</p>`;
       }
@@ -616,6 +1170,88 @@ function copyToClipboard(text, toast) {
       toast.classList.remove('is-visible');
     }, 2400);
   }
+}
+
+/* --------------------------------------------------------------------------
+   7.5 MODAL DE INFORMACIÓN DE PREMIOS Y PROBABILIDADES
+   -------------------------------------------------------------------------- */
+
+/**
+ * Inicializa los eventos del modal informativo de premios
+ */
+function initInfoModal() {
+  const btnInfoTrigger = document.getElementById('btnInfoTrigger');
+  const infoModal = document.getElementById('infoModal');
+  const infoModalCloseBtn = document.getElementById('infoModalCloseBtn');
+  const btnInfoModalClose = document.getElementById('btnInfoModalClose');
+
+  if (!btnInfoTrigger || !infoModal) return;
+
+  btnInfoTrigger.addEventListener('click', () => {
+    openInfoModal();
+  });
+
+  if (infoModalCloseBtn) {
+    infoModalCloseBtn.addEventListener('click', () => {
+      closeInfoModal();
+    });
+  }
+
+  if (btnInfoModalClose) {
+    btnInfoModalClose.addEventListener('click', () => {
+      closeInfoModal();
+    });
+  }
+
+  infoModal.addEventListener('click', (e) => {
+    if (e.target === infoModal) {
+      closeInfoModal();
+    }
+  });
+}
+
+/**
+ * Abre el modal informativo de premios y probabilidades
+ */
+function openInfoModal() {
+  const infoModal = document.getElementById('infoModal');
+  const btnInfoTrigger = document.getElementById('btnInfoTrigger');
+  const qrModal = document.getElementById('qrModal');
+
+  if (!infoModal) return;
+
+  // Cerrar modal QR si estuviera abierto para evitar colisión
+  if (qrModal && !qrModal.hidden) {
+    closeQrModal(qrModal);
+  }
+
+  AppState.lastFocusedElement = btnInfoTrigger;
+
+  infoModal.hidden = false;
+  void infoModal.offsetWidth;
+  infoModal.classList.add('is-open');
+
+  const closeBtn = document.getElementById('infoModalCloseBtn');
+  if (closeBtn) {
+    closeBtn.focus();
+  }
+}
+
+/**
+ * Cierra el modal informativo y restablece el foco accesible
+ */
+function closeInfoModal() {
+  const infoModal = document.getElementById('infoModal');
+  if (!infoModal || infoModal.hidden) return;
+
+  infoModal.classList.remove('is-open');
+  setTimeout(() => {
+    infoModal.hidden = true;
+    const btnInfoTrigger = document.getElementById('btnInfoTrigger');
+    if (btnInfoTrigger && AppState.lastFocusedElement === btnInfoTrigger) {
+      btnInfoTrigger.focus();
+    }
+  }, 220);
 }
 
 /* --------------------------------------------------------------------------
